@@ -12,7 +12,7 @@ merged_settings_cache = {"/": {}}
 # See README for top-level TODOs.
 # The most obvious TODO here is to stop using @classmethod everywhere and
 # structure things more sanely. I couldn't find documentation, however, on
-# (1) how to properly instantiate sublime plugin commands, and 
+# (1) how to properly instantiate sublime plugin commands, and
 # (2) how to manage global data (like caches) for sublime plugins
 # ...leading to this less than ideal whatnot.
 
@@ -57,9 +57,11 @@ class DirectorySettingsEventListener(sublime_plugin.EventListener):
         if os.path.exists(file_name):
             with open(file_name) as f:
                 try:
-                    settings = json.loads(f.read())
+                    settings = f.read()
+                    settings = json.loads(settings)
                 except Exception:
                     settings = {}
+                f.close()
         return settings
 
     @classmethod
@@ -76,7 +78,7 @@ class DirectorySettingsEventListener(sublime_plugin.EventListener):
                 merged_settings = dict(parent_merged_settings.items() + settings.items())
         if merged_settings is None:
             merged_settings = settings
-        assert (merged_settings is not None)            
+        assert (merged_settings is not None)
         merged_settings_cache[directory] = merged_settings
         return merged_settings
 
@@ -90,8 +92,3 @@ class DirectorySettingsEventListener(sublime_plugin.EventListener):
     def on_load(self, view):
         if view.settings().get("use_directory_settings"):
             DirectorySettingsEventListener.apply_directory_settings(view)
-
-
-
-
-    
